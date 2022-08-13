@@ -6,6 +6,13 @@ import html from "remark-html";
 
 const postsDirectory = path.join(process.cwd(), "posts");
 
+export type PostData = {
+	id: string;
+	contentHtml: string;
+	date: string;
+	title: string;
+};
+
 export function getSortedPostsData() {
 	// Get file names under /posts
 	const fileNames = fs.readdirSync(postsDirectory);
@@ -24,7 +31,7 @@ export function getSortedPostsData() {
 		return {
 			id,
 			...matterResult.data,
-		};
+		} as Omit<PostData, "contentHtml">;
 	});
 	// Sort posts by date
 	return allPostsData.sort(({ date: a }, { date: b }) => {
@@ -63,7 +70,7 @@ export function getAllPostIds() {
 	});
 }
 
-export async function getPostData(id) {
+export async function getPostData(id: string): Promise<PostData> {
 	const fullPath = path.join(postsDirectory, `${id}.md`);
 	const fileContents = fs.readFileSync(fullPath, "utf8");
 
@@ -81,5 +88,5 @@ export async function getPostData(id) {
 		id,
 		contentHtml,
 		...matterResult.data,
-	};
+	} as PostData;
 }
